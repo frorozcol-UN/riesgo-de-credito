@@ -14,18 +14,8 @@ from sklearn.decomposition import PCA, TruncatedSVD
 from optbinning import OptimalBinning, BinningProcess
 import xgboost as xgb
 
-with open('models/pipe.pkl','rb') as pi:
-    pipe = joblib.load(pi)
 
-with open('models/regresión_logistica_model.pkl','rb') as lr:
-    log_reg = joblib.load(lr)
-
-with open('models/Arbol_model.pkl','rb') as tr:
-    tree = joblib.load(tr)
-
-with open('models/voting_model_model.pkl','rb') as tr:
-    voting = joblib.load(tr)
-
+best_model = joblib.load('Mejor_Modelo__model.pkl')
 
 def main():
     st.title('Modelamiento de riesgo crediticio')
@@ -40,7 +30,7 @@ def main():
 
         verification_status = {
             'VERIFICADO': 'Verified',
-            'FUENTE VERFICADA': 'Source Verified',
+            'FUENTE VERIFICADA': 'Source Verified',
             'NO VERIFICADO': 'Not Verified'
         }
 
@@ -65,26 +55,25 @@ def main():
 
     def user_input_parameters():
         term = st.sidebar.selectbox('Numero de pagos',(36,60))
-        int_rate = st.sidebar.number_input('Tasa de interes')
+        int_rate = st.sidebar.number_input('Tasa de interes', value=12.0)
         grade = st.sidebar.selectbox('Nota asignada por Lending club', ('A','B','C','D','E','F','G'))
         home_ownership = st.sidebar.selectbox('Estado de propiedad', ('ALQUILER','PROPIO','HIPOTECA','OTROS')) #TRADUCIR
-        verification_status = st.sidebar.selectbox('Verificacion status', ('VERIFICADO','FUENTE VERFICADA', 'NO VERIFICADO')) #TRADUCIR
-        annual_inc = st.sidebar.number_input('Ingreso anual')
+        verification_status = st.sidebar.selectbox('Verificacion status', ('VERIFICADO','FUENTE VERIFICADA', 'NO VERIFICADO')) #TRADUCIR
+        annual_inc = st.sidebar.number_input('Ingreso anual', value = 74000)
         purpose = st.sidebar.selectbox('Proposito del prestamo', ['Tarjeta de credito', 'Carro', 'Micro empresa', 'Boda',
                                                                 'Consolidar deuda', 'Mejora del hogar', 'Compra importante',
                                                                 'Salud', 'Traslado', 'Vacaciones', 'Casa', 'Energia renovable',
                                                                 'Educacion', 'Otros']) #TRADUCIR
-        dti = st.sidebar.number_input('DTI')
-        inq_last_6mths = st.sidebar.number_input('Numero de consultas en los ultimos 6 meses')
-        revol_util = st.sidebar.number_input('tasa de utilizacion de la linea rotatoria')
+        dti = st.sidebar.number_input('DTI', value = 17.2)
+        inq_last_6mths = st.sidebar.number_input('Numero de consultas en los ultimos 6 meses', value = 0)
+        revol_util = st.sidebar.number_input('tasa de utilizacion de la linea rotatoria', value = 56.2)
         initial_list_status = st.sidebar.selectbox('Estado inicial de la lista del prestamo', ('f','w')) #QUESESO
-        total_rec_int = st.sidebar.number_input('Intereses recibidos hasta la fecha')
-        tot_cur_bal = st.sidebar.number_input('Saldo total de todas las cuentas')
-        total_rev_hi_lim = st.sidebar.number_input('Limite del credito')
-        mths_since_issue_d = st.sidebar.number_input('Meses desde que se hizo el prestamo')
-        mths_since_last_credit_pull_d = st.sidebar.number_input('Meses desde que saco credito para este prestamo')
-        #bad_loan = st.sidebar.selectbox('Estado del prestamo', ('PAGO', 'INCOBRABLE','VIGENTE', 'MORA', 
-        #                                'TARDE (31-120 dias)','EN PERIODO DE GRACIA', 'TARDE (16-30 dias)'))#TRADUCIR
+        total_rec_int = st.sidebar.number_input('Intereses recibidos hasta la fecha', value = 2500.0)
+        tot_cur_bal = st.sidebar.number_input('Saldo total de todas las cuentas', value = 130000.0)
+        total_rev_hi_lim = st.sidebar.number_input('Limite del credito', value = 30000)
+        mths_since_issue_d = st.sidebar.number_input('Meses desde que se hizo el prestamo', value = 83)
+        mths_since_last_credit_pull_d = st.sidebar.number_input('Meses desde que saco credito para este prestamo', value = 60)
+
         try:
             home_ownership = translate('home_ownership', home_ownership)
             verification_status = translate('verification_status', verification_status)
@@ -95,7 +84,7 @@ def main():
 
         data = {
             'term':term,
-            'int_rate': int_rate,
+            'int_rate':int_rate,
             'grade': grade,
             'home_ownership': home_ownership,
             'annual_inc': annual_inc,
@@ -114,11 +103,75 @@ def main():
 
         features = pd.DataFrame(data, index =[0])
         return features
+    data_0 = {
+        'term':36,
+        'int_rate': 100,
+        'grade': 'A',
+        'home_ownership': 'MORTAGE',
+        'annual_inc': 77000,
+        'verification_status':'Source Verified',
+        'purpose': 'debt_consolidation',
+        'dti': 21.91,
+        'inq_last_6mths': 1,
+        'revol_util': 53.5,
+        'initial_list_status': 'f',
+        'total_rec_int': 5000.06,
+        'tot_cur_bal': 348253.0,
+        'total_rev_hi_lim': 570000,
+        'mths_since_issue_d':77.0,
+        'mths_since_last_credit_pull_d':55.0,
+    }
+    df_0 = pd.DataFrame(data_0, index =[0])
+
+    data_1 = {
+        'term':36,
+        'int_rate': 14.33,
+        'grade': 'C',
+        'home_ownership': 'MORTAGE',
+        'annual_inc': 112000,
+        'verification_status':'Not Verified',
+        'purpose': 'debt_consolidation',
+        'dti': 7.49,
+        'inq_last_6mths': 2.0,
+        'revol_util': 53.1,
+        'initial_list_status': 'f',
+        'total_rec_int': 2357.02,
+        'tot_cur_bal': 0,
+        'total_rev_hi_lim': 0,
+        'mths_since_issue_d':96.0,
+        'mths_since_last_credit_pull_d':61.0,
+    }
+    df_1 = pd.DataFrame(data_1, index =[0])
+
+    st.markdown('En esta herramienta podrás predecir la probabilidad de que un individuo incumpla sus obligaciones financieras en los siguientes 12 meses a la fecha de originación un crédito adquirido. Para ello, debe diligenciar o modificar los datos que se encuentran a la izquierda según la necesidad y especificación del caso.')
+    st.subheader('Datos ingresados')
     df = user_input_parameters()
-    st.subheader('User Input Parameters')
-    st.write(df)
+    st.dataframe(df)
+
+    
+    def classify(probabilitys,value):
+        #return probabilitys
+        if value[0] == 1:
+            st.snow()
+            return f'El prestatario va a incumplir con sus pagos con una probabilidad del {round(probabilitys[0][1]*100,2)} %.'
+        else:
+            st.balloons()
+            return f'El prestatario va a cumplir con sus pagos con una probabilidad del {round(probabilitys[0][0]*100,2)} %.'
+
     #new_df = pipe.transform(df)
-    if st.button('RUN'):
-        st.success(voting.predict(df))
+    if st.button('EJECUTAR'):
+        st.success(classify(best_model.predict_proba(df), best_model.predict(df)))
+        
+
+    st.subheader('Ejemplo Caso 0')
+    st.dataframe(df_0)
+    if st.button('EJECUTAR CASO 0'):
+        st.success(classify(best_model.predict_proba(df_0), best_model.predict(df_0)))
+    
+    st.subheader('Ejemplo Caso 1')
+    st.dataframe(df_1)
+    if st.button('EJECUTAR CASO 1'):
+        st.success(classify(best_model.predict_proba(df_1), best_model.predict(df_1)))
+
 if __name__ == '__main__':
     main()
