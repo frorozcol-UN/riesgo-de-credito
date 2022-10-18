@@ -1,2 +1,6 @@
 pandas
 streamlit
+joblib
+sklearn
+optbinning
+xgboost
