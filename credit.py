@@ -1,19 +1,6 @@
 import streamlit as st
-import pickle
 import joblib
 import pandas as pd
-
-from sklearn.model_selection import train_test_split, RepeatedStratifiedKFold, cross_val_score
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_curve, roc_auc_score, confusion_matrix, precision_recall_curve, auc
-from sklearn.feature_selection import f_classif
-from sklearn import pipeline, preprocessing, compose
-from sklearn.base import BaseEstimator, TransformerMixin
-from scipy.stats import chi2_contingency
-from sklearn.decomposition import PCA, TruncatedSVD
-from optbinning import OptimalBinning, BinningProcess
-import xgboost as xgb
-
 
 best_model = joblib.load('Mejor_Modelo__model.pkl')
 
